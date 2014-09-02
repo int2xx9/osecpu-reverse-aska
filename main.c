@@ -80,7 +80,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 		"CMPE", "CMPNE", "CMPL", "CMPGE",
 		"CMPLE", "CMPG", "TSTZ", "TSTNZ",
 	};
-	
+
 	// fetch a first instruction
 	instid = fetch_b32value(code, &i, code_bytes);
 	while (i >= 0) {
@@ -89,7 +89,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int uimm = fetch_b32value(code, &i, code_bytes);
 					int opt = fetch_b32value(code, &i, code_bytes);
-					printf("LB(%d, %d);\n", opt, uimm);
+					printf("LB(opt:%d, uimm:%d);\n", opt, uimm);
 				}
 				break;
 			case OSECPU_INST_LIMM:
@@ -97,20 +97,20 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int imm = fetch_b32value(code, &i, code_bytes);
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
-					printf("LIMM(%d, R%02X, 0x%08x);\n", bit, r, imm);
+					printf("LIMM(bit:%d, r:R%02X, imm:0x%08x);\n", bit, r, imm);
 				}
 				break;
 			case OSECPU_INST_PLIMM:
 				{
 					int uimm = fetch_b32value(code, &i, code_bytes);
 					int p = fetch_b32value(code, &i, code_bytes);
-					printf("PLIMM(P%02X, Label:%d);\n", p, uimm);
+					printf("PLIMM(p:P%02X, uimm:%d);\n", p, uimm);
 				}
 				break;
 			case OSECPU_INST_CND:
 				{
 					int r = fetch_b32value(code, &i, code_bytes);
-					printf("CND(R%02X);\n", r);
+					printf("CND(r:R%02X);\n", r);
 				}
 				break;
 			case OSECPU_INST_LMEM:
@@ -120,7 +120,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int zero = fetch_b32value(code, &i, code_bytes);
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
-					printf("LMEM(%d, R%02X, %d, P%02X, %d);\n", bit, r, typ, p, zero);
+					printf("LMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", bit, r, typ, p, zero);
 				}
 				break;
 			case OSECPU_INST_SMEM:
@@ -130,7 +130,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int p = fetch_b32value(code, &i, code_bytes);
 					int typ = fetch_b32value(code, &i, code_bytes);
 					int zero = fetch_b32value(code, &i, code_bytes);
-					printf("SMEM(%d, R%02X, %d, P%02X, %d);\n", bit, r, typ, p, zero);
+					printf("SMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", bit, r, typ, p, zero);
 				}
 				break;
 			case OSECPU_INST_PADD:
@@ -140,7 +140,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
 					int p0 = fetch_b32value(code, &i, code_bytes);
-					printf("PADD(%d, P%02X, %d, P%02X, R%02X);\n", bit, p0, typ, p1, r);
+					printf("PADD(bit:%d, p0]P%02X, typ:%d, p1:P%02X, r:R%02X);\n", bit, p0, typ, p1, r);
 				}
 				break;
 			case OSECPU_INST_OR:
@@ -160,9 +160,9 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int r0 = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
 					if (instid == OSECPU_INST_OR && r1 == r2) {
-						printf("CP(R%02X, R%02X);\n", r0, r1);
+						printf("CP(r0:R%02X, r1:R%02X);\n", r0, r1);
 					} else {
-						printf("%s(%d, R%02X, R%02X, R%02X);\n", operate_inst_name[instid-OSECPU_INST_OR], bit, r0, r1, r2);
+						printf("%s(bit:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", operate_inst_name[instid-OSECPU_INST_OR], bit, r0, r1, r2);
 					}
 				}
 				break;
@@ -180,21 +180,21 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int bit1 = fetch_b32value(code, &i, code_bytes);
 					int r0 = fetch_b32value(code, &i, code_bytes);
 					int bit0 = fetch_b32value(code, &i, code_bytes);
-					printf("%s(%d, %d, R%02X, R%02X, R%02X);\n", compare_inst_name[instid-OSECPU_INST_CMPE], bit0, bit1, r0, r1, r2);
+					printf("%s(bit0:%d, bit1:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", compare_inst_name[instid-OSECPU_INST_CMPE], bit0, bit1, r0, r1, r2);
 				}
 				break;
 			case OSECPU_INST_PCP:
 				{
 					int p1 = fetch_b32value(code, &i, code_bytes);
 					int p0 = fetch_b32value(code, &i, code_bytes);
-					printf("PCP(P%02X, P%02X);\n", p0, p1);
+					printf("PCP(p0:P%02X, p1:P%02X);\n", p0, p1);
 				}
 				break;
 			case OSECPU_INST_DATA:
 				{
 					int typ = fetch_b32value(code, &i, code_bytes);
 					int len = fetch_b32value(code, &i, code_bytes);
-					printf("data(%d, %d);\n", typ, len);
+					printf("data(typ:%d, len:%d);\n", typ, len);
 					i += len*4;
 				}
 				break;
@@ -202,7 +202,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int imm = fetch_b32value(code, &i, code_bytes);
 					int dr = fetch_b32value(code, &i, code_bytes);
-					printf("LIDR(D%02X, %d);\n", dr, imm);
+					printf("LIDR(dr:D%02X, imm:%d);\n", dr, imm);
 				}
 				break;
 			case OSECPU_INST_REM:
