@@ -70,6 +70,7 @@ int fetch_b32value(const unsigned char* code, int* pos, int code_bytes)
 void reverse_aska(const unsigned char* code, int code_bytes)
 {
 	int i = 0;
+	int instpos = 0;
 	enum OsecpuInstructionId instid;
 	static const char* operate_inst_name[] = {
 		"OR", "XOR", "AND", "SBX",
@@ -89,7 +90,9 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int uimm = fetch_b32value(code, &i, code_bytes);
 					int opt = fetch_b32value(code, &i, code_bytes);
-					printf("LB(opt:%d, uimm:%d);\n", opt, uimm);
+					printf("%08x(%8d) : %08x          LB(opt:%d, uimm:%d);\n", instpos, instpos, instid, opt, uimm);
+					printf("%18c : %08x [uimm]\n", ' ', uimm);
+					printf("%18c : %08x [opt]\n", ' ', opt);
 				}
 				break;
 			case OSECPU_INST_LIMM:
@@ -97,20 +100,26 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int imm = fetch_b32value(code, &i, code_bytes);
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
-					printf("LIMM(bit:%d, r:R%02X, imm:0x%08x);\n", bit, r, imm);
+					printf("%08x(%8d) : %08x          LIMM(bit:%d, r:R%02X, imm:0x%08x);\n", instpos, instpos, instid, bit, r, imm);
+					printf("%18c : %08x [imm]\n", ' ', imm);
+					printf("%18c : %08x [r]\n", ' ', r);
+					printf("%18c : %08x [bit]\n", ' ', bit);
 				}
 				break;
 			case OSECPU_INST_PLIMM:
 				{
 					int uimm = fetch_b32value(code, &i, code_bytes);
 					int p = fetch_b32value(code, &i, code_bytes);
-					printf("PLIMM(p:P%02X, uimm:%d);\n", p, uimm);
+					printf("%08x(%8d) : %08x          PLIMM(p:P%02X, uimm:%d);\n", instpos, instpos, instid, p, uimm);
+					printf("%18c : %08x [uimm]\n", ' ', uimm);
+					printf("%18c : %08x [p]\n", ' ', p);
 				}
 				break;
 			case OSECPU_INST_CND:
 				{
 					int r = fetch_b32value(code, &i, code_bytes);
-					printf("CND(r:R%02X);\n", r);
+					printf("%08x(%8d) : %08x          CND(r:R%02X);\n", instpos, instpos, instid, r);
+					printf("%18c : %08x [r]\n", ' ', r);
 				}
 				break;
 			case OSECPU_INST_LMEM:
@@ -120,7 +129,12 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int zero = fetch_b32value(code, &i, code_bytes);
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
-					printf("LMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", bit, r, typ, p, zero);
+					printf("%08x(%8d) : %08x          LMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", instpos, instpos, instid, bit, r, typ, p, zero);
+					printf("%18c : %08x [p]\n", ' ', p);
+					printf("%18c : %08x [typ]\n", ' ', typ);
+					printf("%18c : %08x\n", ' ', zero);
+					printf("%18c : %08x [r]\n", ' ', r);
+					printf("%18c : %08x [bit]\n", ' ', bit);
 				}
 				break;
 			case OSECPU_INST_SMEM:
@@ -130,7 +144,12 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int p = fetch_b32value(code, &i, code_bytes);
 					int typ = fetch_b32value(code, &i, code_bytes);
 					int zero = fetch_b32value(code, &i, code_bytes);
-					printf("SMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", bit, r, typ, p, zero);
+					printf("%08x(%8d) : %08x          SMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", instpos, instpos, instid, bit, r, typ, p, zero);
+					printf("%18c : %08x [r]\n", ' ', r);
+					printf("%18c : %08x [bit]\n", ' ', bit);
+					printf("%18c : %08x [p]\n", ' ', p);
+					printf("%18c : %08x [typ]\n", ' ', typ);
+					printf("%18c : %08x\n", ' ', zero);
 				}
 				break;
 			case OSECPU_INST_PADD:
@@ -140,7 +159,12 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
 					int p0 = fetch_b32value(code, &i, code_bytes);
-					printf("PADD(bit:%d, p0]P%02X, typ:%d, p1:P%02X, r:R%02X);\n", bit, p0, typ, p1, r);
+					printf("%08x(%8d) : %08x          PADD(bit:%d, p0]P%02X, typ:%d, p1:P%02X, r:R%02X);\n", instpos, instpos, instid, bit, p0, typ, p1, r);
+					printf("%18c : %08x [p1]\n", ' ', p1);
+					printf("%18c : %08x [typ]\n", ' ', typ);
+					printf("%18c : %08x [r]\n", ' ', r);
+					printf("%18c : %08x [bit]\n", ' ', bit);
+					printf("%18c : %08x [p0]\n", ' ', p0);
 				}
 				break;
 			case OSECPU_INST_OR:
@@ -160,9 +184,15 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int r0 = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
 					if (instid == OSECPU_INST_OR && r1 == r2) {
-						printf("CP(r0:R%02X, r1:R%02X);\n", r0, r1);
+						printf("%08x(%8d) : %08x          CP(r0:R%02X, r1:R%02X);\n", instpos, instpos, instid, r0, r1);
+						printf("%18c : %08x [r0]\n", ' ', r0);
+						printf("%18c : %08x [r1]\n", ' ', r1);
 					} else {
-						printf("%s(bit:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", operate_inst_name[instid-OSECPU_INST_OR], bit, r0, r1, r2);
+						printf("%08x(%8d) : %08x          %s(bit:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", instpos, instpos, instid, operate_inst_name[instid-OSECPU_INST_OR], bit, r0, r1, r2);
+						printf("%18c : %08x [bit]\n", ' ', bit);
+						printf("%18c : %08x [r0]\n", ' ', r0);
+						printf("%18c : %08x [r1]\n", ' ', r1);
+						printf("%18c : %08x [r2]\n", ' ', r2);
 					}
 				}
 				break;
@@ -180,21 +210,32 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int bit1 = fetch_b32value(code, &i, code_bytes);
 					int r0 = fetch_b32value(code, &i, code_bytes);
 					int bit0 = fetch_b32value(code, &i, code_bytes);
-					printf("%s(bit0:%d, bit1:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", compare_inst_name[instid-OSECPU_INST_CMPE], bit0, bit1, r0, r1, r2);
+					printf("%08x(%8d) : %08x          %s(bit0:%d, bit1:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", instpos, instpos, instid, compare_inst_name[instid-OSECPU_INST_CMPE], bit0, bit1, r0, r1, r2);
+					printf("%18c : %08x [r1]\n", ' ', r1);
+					printf("%18c : %08x [r2]\n", ' ', r2);
+					printf("%18c : %08x [bit1]\n", ' ', bit1);
+					printf("%18c : %08x [r0]\n", ' ', r0);
+					printf("%18c : %08x [bit0]\n", ' ', bit0);
 				}
 				break;
 			case OSECPU_INST_PCP:
 				{
 					int p1 = fetch_b32value(code, &i, code_bytes);
 					int p0 = fetch_b32value(code, &i, code_bytes);
-					printf("PCP(p0:P%02X, p1:P%02X);\n", p0, p1);
+					printf("%08x(%8d) : %08x          PCP(p0:P%02X, p1:P%02X);\n", instpos, instpos, instid, p0, p1);
+					printf("%18c : %08x [p1]\n", ' ', p1);
+					printf("%18c : %08x [p0]\n", ' ', p0);
 				}
 				break;
 			case OSECPU_INST_DATA:
 				{
 					int typ = fetch_b32value(code, &i, code_bytes);
 					int len = fetch_b32value(code, &i, code_bytes);
-					printf("data(typ:%d, len:%d);\n", typ, len);
+					int j;
+					printf("%08x(%8d) : %08x          data(typ:%d, len:%d);\n", instpos, instpos, instid, typ, len);
+					printf("%18c : %08x [typ]\n", ' ', typ);
+					printf("%18c : %08x [len]\n", ' ', len);
+					printf("%18c : (%d bytes suppressed)\n", ' ', len*4);
 					i += len*4;
 				}
 				break;
@@ -202,7 +243,9 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int imm = fetch_b32value(code, &i, code_bytes);
 					int dr = fetch_b32value(code, &i, code_bytes);
-					printf("LIDR(dr:D%02X, imm:%d);\n", dr, imm);
+					printf("%08x(%8d) : %08x          LIDR(dr:D%02X, imm:%d);\n", instpos, instpos, instid, dr, imm);
+					printf("%18c : %08x [imm]\n", ' ', imm);
+					printf("%18c : %08x [dr]\n", ' ', dr);
 				}
 				break;
 			case OSECPU_INST_REM:
@@ -220,18 +263,21 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 							printf("(unknown instruction:REM%02X)\n", uimm);
 							goto fin;
 					}
+					printf("%08x(%8d) : %08x          REM%02X(...);\n", instpos, instpos, instid, uimm);
+					printf("%18c : %08x\n", ' ', uimm);
 					while (skipcnt-- > 0) {
-						fetch_b32value(code, &i, code_bytes);
+						int value = fetch_b32value(code, &i, code_bytes);
+						printf("%18c : %08x\n", ' ', value);
 					}
-					printf("REM%02X(...);\n", uimm);
 				}
 				break;
 			default:
 				printf("(unknown instruction:%x)\n", instid);
 				goto fin;
 		}
-		
+
 		// fetch a next instruction
+		instpos = i;
 		instid = fetch_b32value(code, &i, code_bytes);
 	}
 fin:
