@@ -70,7 +70,7 @@ int fetch_b32value(const unsigned char* code, int* pos, int code_bytes)
 void reverse_aska(const unsigned char* code, int code_bytes)
 {
 	int i = 0;
-	int instpos = 0;
+	int instpos = 0, instnum = 0;
 	enum OsecpuInstructionId instid;
 	static const char* operate_inst_name[] = {
 		"OR", "XOR", "AND", "SBX",
@@ -90,7 +90,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int uimm = fetch_b32value(code, &i, code_bytes);
 					int opt = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          LB(opt:%d, uimm:%d);\n", instpos, instpos, instid, opt, uimm);
+					printf("%08x(%8d) : %08x          LB(opt:%d, uimm:%d);\n", instpos, instnum, instid, opt, uimm);
 					printf("%18c : %08x [uimm]\n", ' ', uimm);
 					printf("%18c : %08x [opt]\n", ' ', opt);
 				}
@@ -100,7 +100,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int imm = fetch_b32value(code, &i, code_bytes);
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          LIMM(bit:%d, r:R%02X, imm:0x%08x);\n", instpos, instpos, instid, bit, r, imm);
+					printf("%08x(%8d) : %08x          LIMM(bit:%d, r:R%02X, imm:0x%08x);\n", instpos, instnum, instid, bit, r, imm);
 					printf("%18c : %08x [imm]\n", ' ', imm);
 					printf("%18c : %08x [r]\n", ' ', r);
 					printf("%18c : %08x [bit]\n", ' ', bit);
@@ -110,7 +110,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int uimm = fetch_b32value(code, &i, code_bytes);
 					int p = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          PLIMM(p:P%02X, uimm:%d);\n", instpos, instpos, instid, p, uimm);
+					printf("%08x(%8d) : %08x          PLIMM(p:P%02X, uimm:%d);\n", instpos, instnum, instid, p, uimm);
 					printf("%18c : %08x [uimm]\n", ' ', uimm);
 					printf("%18c : %08x [p]\n", ' ', p);
 				}
@@ -118,7 +118,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 			case OSECPU_INST_CND:
 				{
 					int r = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          CND(r:R%02X);\n", instpos, instpos, instid, r);
+					printf("%08x(%8d) : %08x          CND(r:R%02X);\n", instpos, instnum, instid, r);
 					printf("%18c : %08x [r]\n", ' ', r);
 				}
 				break;
@@ -129,7 +129,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int zero = fetch_b32value(code, &i, code_bytes);
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          LMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", instpos, instpos, instid, bit, r, typ, p, zero);
+					printf("%08x(%8d) : %08x          LMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", instpos, instnum, instid, bit, r, typ, p, zero);
 					printf("%18c : %08x [p]\n", ' ', p);
 					printf("%18c : %08x [typ]\n", ' ', typ);
 					printf("%18c : %08x\n", ' ', zero);
@@ -144,7 +144,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int p = fetch_b32value(code, &i, code_bytes);
 					int typ = fetch_b32value(code, &i, code_bytes);
 					int zero = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          SMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", instpos, instpos, instid, bit, r, typ, p, zero);
+					printf("%08x(%8d) : %08x          SMEM(bit:%d, r:R%02X, typ:%d, p:P%02X, %d);\n", instpos, instnum, instid, bit, r, typ, p, zero);
 					printf("%18c : %08x [r]\n", ' ', r);
 					printf("%18c : %08x [bit]\n", ' ', bit);
 					printf("%18c : %08x [p]\n", ' ', p);
@@ -159,7 +159,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int r = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
 					int p0 = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          PADD(bit:%d, p0]P%02X, typ:%d, p1:P%02X, r:R%02X);\n", instpos, instpos, instid, bit, p0, typ, p1, r);
+					printf("%08x(%8d) : %08x          PADD(bit:%d, p0]P%02X, typ:%d, p1:P%02X, r:R%02X);\n", instpos, instnum, instid, bit, p0, typ, p1, r);
 					printf("%18c : %08x [p1]\n", ' ', p1);
 					printf("%18c : %08x [typ]\n", ' ', typ);
 					printf("%18c : %08x [r]\n", ' ', r);
@@ -184,11 +184,11 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int r0 = fetch_b32value(code, &i, code_bytes);
 					int bit = fetch_b32value(code, &i, code_bytes);
 					if (instid == OSECPU_INST_OR && r1 == r2) {
-						printf("%08x(%8d) : %08x          CP(r0:R%02X, r1:R%02X);\n", instpos, instpos, instid, r0, r1);
+						printf("%08x(%8d) : %08x          CP(r0:R%02X, r1:R%02X);\n", instpos, instnum, instid, r0, r1);
 						printf("%18c : %08x [r0]\n", ' ', r0);
 						printf("%18c : %08x [r1]\n", ' ', r1);
 					} else {
-						printf("%08x(%8d) : %08x          %s(bit:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", instpos, instpos, instid, operate_inst_name[instid-OSECPU_INST_OR], bit, r0, r1, r2);
+						printf("%08x(%8d) : %08x          %s(bit:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", instpos, instnum, instid, operate_inst_name[instid-OSECPU_INST_OR], bit, r0, r1, r2);
 						printf("%18c : %08x [bit]\n", ' ', bit);
 						printf("%18c : %08x [r0]\n", ' ', r0);
 						printf("%18c : %08x [r1]\n", ' ', r1);
@@ -210,7 +210,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int bit1 = fetch_b32value(code, &i, code_bytes);
 					int r0 = fetch_b32value(code, &i, code_bytes);
 					int bit0 = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          %s(bit0:%d, bit1:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", instpos, instpos, instid, compare_inst_name[instid-OSECPU_INST_CMPE], bit0, bit1, r0, r1, r2);
+					printf("%08x(%8d) : %08x          %s(bit0:%d, bit1:%d, r0:R%02X, r1:R%02X, r2:R%02X);\n", instpos, instnum, instid, compare_inst_name[instid-OSECPU_INST_CMPE], bit0, bit1, r0, r1, r2);
 					printf("%18c : %08x [r1]\n", ' ', r1);
 					printf("%18c : %08x [r2]\n", ' ', r2);
 					printf("%18c : %08x [bit1]\n", ' ', bit1);
@@ -222,7 +222,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int p1 = fetch_b32value(code, &i, code_bytes);
 					int p0 = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          PCP(p0:P%02X, p1:P%02X);\n", instpos, instpos, instid, p0, p1);
+					printf("%08x(%8d) : %08x          PCP(p0:P%02X, p1:P%02X);\n", instpos, instnum, instid, p0, p1);
 					printf("%18c : %08x [p1]\n", ' ', p1);
 					printf("%18c : %08x [p0]\n", ' ', p0);
 				}
@@ -232,7 +232,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 					int typ = fetch_b32value(code, &i, code_bytes);
 					int len = fetch_b32value(code, &i, code_bytes);
 					int j;
-					printf("%08x(%8d) : %08x          data(typ:%d, len:%d);\n", instpos, instpos, instid, typ, len);
+					printf("%08x(%8d) : %08x          data(typ:%d, len:%d);\n", instpos, instnum, instid, typ, len);
 					printf("%18c : %08x [typ]\n", ' ', typ);
 					printf("%18c : %08x [len]\n", ' ', len);
 					printf("%18c : (%d bytes suppressed)\n", ' ', len*4);
@@ -243,7 +243,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 				{
 					int imm = fetch_b32value(code, &i, code_bytes);
 					int dr = fetch_b32value(code, &i, code_bytes);
-					printf("%08x(%8d) : %08x          LIDR(dr:D%02X, imm:%d);\n", instpos, instpos, instid, dr, imm);
+					printf("%08x(%8d) : %08x          LIDR(dr:D%02X, imm:%d);\n", instpos, instnum, instid, dr, imm);
 					printf("%18c : %08x [imm]\n", ' ', imm);
 					printf("%18c : %08x [dr]\n", ' ', dr);
 				}
@@ -263,7 +263,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 							printf("(unknown instruction:REM%02X)\n", uimm);
 							goto fin;
 					}
-					printf("%08x(%8d) : %08x          REM%02X(...);\n", instpos, instpos, instid, uimm);
+					printf("%08x(%8d) : %08x          REM%02X(...);\n", instpos, instnum, instid, uimm);
 					printf("%18c : %08x\n", ' ', uimm);
 					while (skipcnt-- > 0) {
 						int value = fetch_b32value(code, &i, code_bytes);
@@ -279,6 +279,7 @@ void reverse_aska(const unsigned char* code, int code_bytes)
 		// fetch a next instruction
 		instpos = i;
 		instid = fetch_b32value(code, &i, code_bytes);
+		instnum++;
 	}
 fin:
 	return;
